@@ -26,6 +26,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
+    tableName: 'Users', // ← AGREGAR ESTA LÍNEA
+    freezeTableName: true // ← OPCIONAL
   });
   return User;
 };

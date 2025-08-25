@@ -5,7 +5,6 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Rol extends Model {
     static associate(models) {
-      // Definir asociación con User
       Rol.hasMany(models.User, {
         foreignKey: 'rolId',
         as: 'Users'
@@ -17,6 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Rol',
+    tableName: 'Rols', // ← AGREGAR ESTA LÍNEA
+    freezeTableName: true // ← OPCIONAL: evitar pluralización
   });
   return Rol;
 };
