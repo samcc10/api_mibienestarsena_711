@@ -9,7 +9,7 @@
   "test": {
     "username": "root",
     "password": null,
-    "database": "database_test",
+    "database": "mibienestar711_test",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
@@ -17,13 +17,16 @@
     "username": "davidm",
     "password": "QTKwp2fbTUQAcuoI7NGrwOORZLQP426N",
     "database": "db_miapi_rest",
-    "host": "oregon_postgres.render.com",
+    "host": "dpg-d2md101r0fns73d16cvg-a.oregon-postgres.render.com",
+    "port": 5432, 
     "dialect": "postgres",
+    "protocol": "postgres",
     "dialectOptions": {
       "ssl": {
         "require": true,
         "rejectUnauthorized": false
       }
-    }
+    },
+    "logging": false
   }
 }
