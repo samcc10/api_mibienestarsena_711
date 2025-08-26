@@ -1,86 +1,111 @@
 const db = require('../models');
 
-const getAllCategories = async () => {
-    try {
-        const categories = await db.Categorie.findAll();
-        if (!categories || categories.length === 0) {
-            throw { status: 404, message: "No se encontraron categorías" };
-        }
-        return categories;
-    } catch (error) {
-        throw { 
-            status: error.status || 500,
-            message: error.message || "Error al obtener categorías"
-        };
+const getAllEvents = async () => {
+  try {
+    const events = await db.Event.findAll({
+      include: {
+        model: db.Categorie,
+        as: 'category',
+        required: true,
+        attributes: ['id', 'nombre', 'descripcion']
+      }
+    });
+
+    if (!events || events.length === 0) {
+      throw { status: 404, message: "No se encontraron eventos" };
     }
+
+    return events;
+  } catch (error) {
+    throw {
+      status: error.status || 500,
+      message: error.message || "Error al obtener eventos"
+    };
+  }
 };
 
-const getCategorie = async (id) => {
-    try {
-        const categorie = await db.Categorie.findByPk(id);
-        if (!categorie) {
-            throw { status: 404, message: "Categoría no encontrada" };
-        }
-        return categorie;
-    } catch (error) {
-        throw { 
-            status: error.status || 500,
-            message: error.message || "Error al obtener la categoría"
-        };
+const getEvent = async (id) => {
+  try {
+    const event = await db.Event.findByPk(id, {
+      include: {
+        model: db.Categorie,
+        as: 'category',
+        required: true,
+        attributes: ['id', 'nombre', 'descripcion']
+      }
+    });
+
+    if (!event) {
+      throw { status: 404, message: "Evento no encontrado" };
     }
+
+    return event;
+  } catch (error) {
+    throw {
+      status: error.status || 500,
+      message: error.message || "Error al obtener el evento"
+    };
+  }
 };
 
-const createCategorie = async (nombre, descripcion, imagen) => {
-    try {
-        if (!nombre) {
-            throw { status: 400, message: "El nombre es requerido" };
-        }
-        return await db.Categorie.create({ nombre, descripcion, imagen });
-    } catch (error) {
-        throw { 
-            status: error.status || 400,
-            message: error.message || "Error al crear categoría"
-        };
+const createEvent = async (payload) => {
+  try {
+    const { name, description, startDate, endDate, categoryId, state, maxCapacity, userId } = payload;
+
+    if (!name) {
+      throw { status: 400, message: "El nombre es requerido" };
     }
+    if (!categoryId) {
+      throw { status: 400, message: "La categoría es requerida" };
+    }
+
+    return await db.Event.create({ name, description, startDate, endDate, categoryId, state, maxCapacity, userId });
+  } catch (error) {
+    throw {
+      status: error.status || 400,
+      message: error.message || "Error al crear evento"
+    };
+  }
 };
 
-const updateCategorie = async (id, nombre, descripcion, imagen) => {
-    try {
-        const [updatedRows] = await db.Categorie.update(
-            { nombre, descripcion, imagen },
-            { where: { id } }
-        );
-        if (updatedRows === 0) {
-            throw { status: 404, message: "Categoría no encontrada" };
-        }
-        return { id, nombre, descripcion, imagen };
-    } catch (error) {
-        throw { 
-            status: error.status || 400,
-            message: error.message || "Error al actualizar categoría"
-        };
+const updateEvent = async (id, payload) => {
+  try {
+    const [updatedRows] = await db.Event.update(payload, { where: { id } });
+
+    if (updatedRows === 0) {
+      throw { status: 404, message: "Evento no encontrado" };
     }
+
+    return { id, ...payload };
+  } catch (error) {
+    throw {
+      status: error.status || 400,
+      message: error.message || "Error al actualizar evento"
+    };
+  }
 };
 
-const deleteCategorie = async (id) => {
-    try {
-        const deletedRows = await db.Categorie.destroy({ where: { id } });
-        if (deletedRows === 0) {
-            throw { status: 404, message: "Categoría no encontrada" };
-        }
-        return { message: "Categoría eliminada correctamente" };
-    } catch (error) {
-        throw { 
-            status: error.status || 400,
-            message: error.message || "Error al eliminar categoría"
-        };
+const deleteEvent = async (id) => {
+  try {
+    const deletedRows = await db.Event.destroy({ where: { id } });
+
+    if (deletedRows === 0) {
+      throw { status: 404, message: "Evento no encontrado" };
     }
+
+    return { message: "Evento eliminado correctamente" };
+  } catch (error) {
+    throw {
+      status: error.status || 400,
+      message: error.message || "Error al eliminar evento"
+    };
+  }
 };
 
 module.exports = {
-    getAllCategories,
-    getCategorie,
-    createCategorie,
-    updateCategorie,
-    deleteCategorie
+  getAllEvents,
+  getEvent,
+  createEvent,
+  updateEvent,
+  deleteEvent
 };

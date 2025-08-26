@@ -1,92 +1,43 @@
 const db = require('../models');
 
 const getAllEvents = async () => {
-    try {
-        let Events = await db.Event.findAll({
-            include: {
-                model: db.Categorie,
-                required: true,
-                as: "category",
-                attributes: ["id", "nombre", "descripcion"]
-            }
-        });
-        return Events;
-    } catch (error) {
-        return error.message || "Failed to get Events";
-    }
+  return await db.Event.findAll({
+    include: { model: db.Categorie, as: 'category', required: true, attributes: ['id','nombre','descripcion'] }
+  });
 };
 
 const getEvent = async (id) => {
-    try {
-        let Event = await db.Event.findByPk(id, {
-            include: {
-                model: db.Categorie,
-                required: true,
-                as: "category",
-                attributes: ["id", "nombre", "descripcion"]
-            }
-        });
-        return Event;
-    } catch (error) {
-        throw { status: 500, message: error.message || "Failed to get Event" };
-    }
+  return await db.Event.findByPk(id, {
+    include: { model: db.Categorie, as: 'category', required: true, attributes: ['id','nombre','descripcion'] }
+  });
 };
 
-const createEvent = async (name, description, startDate, endDate, categoryId, state, maxCapacity) => {
-    try {
-        let newEvent = await db.Event.create({
-            name,
-            description,
-            startDate,
-            endDate,
-            categoryId,
-            state,
-            maxCapacity
-        });
-        return newEvent;
-    } catch (error) {
-        return error.message || "Event could not be created";
-    }
+// ⬇⬇ Cambiado: recibe un solo objeto
+const createEvent = async (payload) => {
+  try {
+    const { name, description, startDate, endDate, categoryId, state, maxCapacity, userId } = payload;
+    return await db.Event.create({ name, description, startDate, endDate, categoryId, state, maxCapacity, userId });
+  } catch (err) {
+    throw err; // lanza para que el controlador responda 4xx/5xx
+  }
 };
 
-const updateEvent = async (id, name, description, startDate, endDate, categoryId, state, maxCapacity) => {
-    try {
-        let updatedEvent = await db.Event.update({
-            name,
-            description,
-            startDate,
-            endDate,
-            categoryId,
-            state,
-            maxCapacity
-        }, {
-            where: {
-                id
-            }
-        });
-        return updatedEvent;
-    } catch (error) {
-        return error.message || "Event could not be updated";
-    }
+// ⬇⬇ Cambiado: segundo parámetro es objeto (ya lo envía así tu controlador)
+const updateEvent = async (id, payload) => {
+  try {
+    const [count] = await db.Event.update(payload, { where: { id } });
+    return count;
+  } catch (err) {
+    throw err;
+  }
 };
 
 const deleteEvent = async (id) => {
-    try {
-        const deletedEvent = await db.Event.destroy({
-            where: {
-                id
-            }
-        });
-        return deletedEvent;
-    } catch (error) {
-        return error.message || "Event could not be deleted";
-    }
+  try {
+    return await db.Event.destroy({ where: { id } });
+  } catch (err) {
+    throw err;
+  }
 };
 
-module.exports = {
-    getAllEvents,
-    getEvent,
-    createEvent,
-    updateEvent,
-    deleteEvent
-};
+module.exports = { getAllEvents, getEvent, createEvent, updateEvent, deleteEvent };
