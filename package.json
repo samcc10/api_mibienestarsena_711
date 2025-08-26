@@ -6,13 +6,10 @@
   "scripts": {
     "start": "node ./node_modules/sequelize-cli/lib/sequelize db:migrate --env production && node server.js",
     "dev": "nodemon server.js",
-
     "migrate": "node ./node_modules/sequelize-cli/lib/sequelize db:migrate --env production",
     "migrate:undo": "node ./node_modules/sequelize-cli/lib/sequelize db:migrate:undo:all --env production",
-
     "seed": "node ./node_modules/sequelize-cli/lib/sequelize db:seed:all --env production",
     "seed:undo": "node ./node_modules/sequelize-cli/lib/sequelize db:seed:undo:all --env production",
-    
     "reset-db": "node ./node_modules/sequelize-cli/lib/sequelize db:drop --env production && node ./node_modules/sequelize-cli/lib/sequelize db:create --env production && node ./node_modules/sequelize-cli/lib/sequelize db:migrate --env production"
   },
   "keywords": [],
@@ -21,6 +18,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "morgan": "^1.10.1",
     "mysql2": "^3.14.3",
     "pg": "^8.16.3",
     "sequelize": "^6.37.7",
