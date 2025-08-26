@@ -75,6 +75,8 @@ const deleteCategorie = async (id) => {
   }
 };
 
+// metodos
+
 module.exports = {
   getAllCategories,
   getCategorie,
