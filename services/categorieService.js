@@ -1,111 +1,84 @@
 const db = require('../models');
 
-const getAllEvents = async () => {
+const getAllCategories = async () => {
   try {
-    const events = await db.Event.findAll({
-      include: {
-        model: db.Categorie,
-        as: 'category',
-        required: true,
-        attributes: ['id', 'nombre', 'descripcion']
-      }
-    });
-
-    if (!events || events.length === 0) {
-      throw { status: 404, message: "No se encontraron eventos" };
+    const categories = await db.Categorie.findAll();
+    if (!categories || categories.length === 0) {
+      throw { status: 404, message: "No se encontraron categorías" };
     }
-
-    return events;
+    return categories;
   } catch (error) {
     throw {
       status: error.status || 500,
-      message: error.message || "Error al obtener eventos"
+      message: error.message || "Error al obtener categorías"
     };
   }
 };
 
-const getEvent = async (id) => {
+const getCategorie = async (id) => {
   try {
-    const event = await db.Event.findByPk(id, {
-      include: {
-        model: db.Categorie,
-        as: 'category',
-        required: true,
-        attributes: ['id', 'nombre', 'descripcion']
-      }
-    });
-
-    if (!event) {
-      throw { status: 404, message: "Evento no encontrado" };
+    const categorie = await db.Categorie.findByPk(id);
+    if (!categorie) {
+      throw { status: 404, message: "Categoría no encontrada" };
     }
-
-    return event;
+    return categorie;
   } catch (error) {
     throw {
       status: error.status || 500,
-      message: error.message || "Error al obtener el evento"
+      message: error.message || "Error al obtener la categoría"
     };
   }
 };
 
-const createEvent = async (payload) => {
+const createCategorie = async (nombre, descripcion, imagen) => {
   try {
-    const { name, description, startDate, endDate, categoryId, state, maxCapacity, userId } = payload;
-
-    if (!name) {
-      throw { status: 400, message: "El nombre es requerido" };
-    }
-    if (!categoryId) {
-      throw { status: 400, message: "La categoría es requerida" };
-    }
-
-    return await db.Event.create({ name, description, startDate, endDate, categoryId, state, maxCapacity, userId });
+    if (!nombre) throw { status: 400, message: "El nombre es requerido" };
+    return await db.Categorie.create({ nombre, descripcion, imagen });
   } catch (error) {
     throw {
       status: error.status || 400,
-      message: error.message || "Error al crear evento"
+      message: error.message || "Error al crear categoría"
     };
   }
 };
 
-const updateEvent = async (id, payload) => {
+const updateCategorie = async (id, nombre, descripcion, imagen) => {
   try {
-    const [updatedRows] = await db.Event.update(payload, { where: { id } });
-
+    const [updatedRows] = await db.Categorie.update(
+      { nombre, descripcion, imagen },
+      { where: { id } }
+    );
     if (updatedRows === 0) {
-      throw { status: 404, message: "Evento no encontrado" };
+      throw { status: 404, message: "Categoría no encontrada" };
     }
-
-    return { id, ...payload };
+    return { id, nombre, descripcion, imagen };
   } catch (error) {
     throw {
       status: error.status || 400,
-      message: error.message || "Error al actualizar evento"
+      message: error.message || "Error al actualizar categoría"
     };
   }
 };
 
-const deleteEvent = async (id) => {
+const deleteCategorie = async (id) => {
   try {
-    const deletedRows = await db.Event.destroy({ where: { id } });
-
+    const deletedRows = await db.Categorie.destroy({ where: { id } });
     if (deletedRows === 0) {
-      throw { status: 404, message: "Evento no encontrado" };
+      throw { status: 404, message: "Categoría no encontrada" };
     }
-
-    return { message: "Evento eliminado correctamente" };
+    return { message: "Categoría eliminada correctamente" };
   } catch (error) {
     throw {
       status: error.status || 400,
-      message: error.message || "Error al eliminar evento"
+      message: error.message || "Error al eliminar categoría"
     };
   }
 };
 
 module.exports = {
-  getAllEvents,
-  getEvent,
-  createEvent,
-  updateEvent,
-  deleteEvent
+  getAllCategories,
+  getCategorie,
+  createCategorie,
+  updateCategorie,
+  deleteCategorie
 };
