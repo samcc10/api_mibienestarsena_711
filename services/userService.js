@@ -5,8 +5,8 @@ const getAllUsers = async () => {
     let users = await db.User.findAll({
       include: {
         model: db.Rol,
-        required: true,
-        as: "Rol", // ← Agregar el alias 'as'
+        required: false,
+        as: "rol", // ← CAMBIADO: de "Rol" a "rol" (minúscula)
         attributes: ["id", "name"],
       },
     });
@@ -21,8 +21,8 @@ const getUser = async (id) => {
     let user = await db.User.findByPk(id, {
       include: {
         model: db.Rol,
-        required: true,
-        as: "Rol", // ← Agregar el alias 'as'
+        required: false,
+        as: "rol", // ← CAMBIADO: de "Rol" a "rol" (minúscula)
         attributes: ["id", "name"],
       },
     });

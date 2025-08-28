@@ -3,9 +3,6 @@ const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Event extends Model {
-    /**
-     * Helper method for defining associations.
-     */
     static associate(models) {
       // Un evento pertenece a una categoría
       Event.belongsTo(models.Categorie, {
@@ -13,10 +10,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'categoryId'
       });
 
-      // Una categoría tiene muchos eventos
-      models.Categorie.hasMany(Event, {
-        as: 'events',
-        foreignKey: 'categoryId'
+      // ⬇⬇⬇ NUEVA ASOCIACIÓN: Un evento pertenece a un usuario
+      Event.belongsTo(models.User, {
+        as: 'user',
+        foreignKey: 'userId'
       });
     }
   }
@@ -30,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
     startDate: DataTypes.DATE,
     endDate: DataTypes.DATE,
     categoryId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    userId: {  // ESTE CAMPO YA EXISTE EN TU BD
       type: DataTypes.INTEGER,
       allowNull: false
     },

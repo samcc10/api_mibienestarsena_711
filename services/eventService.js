@@ -2,42 +2,71 @@ const db = require('../models');
 
 const getAllEvents = async () => {
   return await db.Event.findAll({
-    include: { model: db.Categorie, as: 'category', required: true, attributes: ['id','nombre','descripcion'] }
+    include: [
+      { 
+        model: db.Categorie, 
+        as: 'category', 
+        attributes: ['id','nombre','descripcion'] 
+      },
+      { 
+        model: db.User,
+        as: 'user',
+        attributes: ['id', 'username', 'email']
+      }
+    ]
   });
 };
 
 const getEvent = async (id) => {
   return await db.Event.findByPk(id, {
-    include: { model: db.Categorie, as: 'category', required: true, attributes: ['id','nombre','descripcion'] }
+    include: [
+      { 
+        model: db.Categorie, 
+        as: 'category', 
+        attributes: ['id','nombre','descripcion'] 
+      },
+      { 
+        model: db.User,
+        as: 'user',
+        attributes: ['id', 'username', 'email']
+      }
+    ]
   });
 };
 
-// ⬇⬇ Cambiado: recibe un solo objeto
 const createEvent = async (payload) => {
-  try {
-    const { name, description, startDate, endDate, categoryId, state, maxCapacity, userId } = payload;
-    return await db.Event.create({ name, description, startDate, endDate, categoryId, state, maxCapacity, userId });
-  } catch (err) {
-    throw err; // lanza para que el controlador responda 4xx/5xx
+  const { name, description, startDate, endDate, categoryId, state, maxCapacity, userId } = payload;
+  
+  // Validar que el usuario exista
+  const user = await db.User.findByPk(userId);
+  if (!user) {
+    throw { status: 400, message: "El usuario especificado no existe" };
   }
+  
+  // Validar que la categoría exista
+  const category = await db.Categorie.findByPk(categoryId);
+  if (!category) {
+    throw { status: 400, message: "La categoría especificada no existe" };
+  }
+  
+  return await db.Event.create({ 
+    name, description, startDate, endDate, categoryId, state, maxCapacity, userId 
+  });
 };
 
-// ⬇⬇ Cambiado: segundo parámetro es objeto (ya lo envía así tu controlador)
 const updateEvent = async (id, payload) => {
-  try {
-    const [count] = await db.Event.update(payload, { where: { id } });
-    return count;
-  } catch (err) {
-    throw err;
-  }
+  const [updatedRows] = await db.Event.update(payload, { where: { id } });
+  return updatedRows;
 };
 
 const deleteEvent = async (id) => {
-  try {
-    return await db.Event.destroy({ where: { id } });
-  } catch (err) {
-    throw err;
-  }
+  return await db.Event.destroy({ where: { id } });
 };
 
-module.exports = { getAllEvents, getEvent, createEvent, updateEvent, deleteEvent };
+module.exports = { 
+  getAllEvents, 
+  getEvent, 
+  createEvent, 
+  updateEvent, 
+  deleteEvent 
+};
