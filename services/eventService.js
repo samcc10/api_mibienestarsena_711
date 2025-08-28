@@ -1,92 +1,72 @@
 const db = require('../models');
 
 const getAllEvents = async () => {
-    try {
-        let Events = await db.Event.findAll({
-            include: {
-                model: db.Categorie,
-                required: true,
-                as: "category",
-                attributes: ["id", "nombre", "descripcion"]
-            }
-        });
-        return Events;
-    } catch (error) {
-        return error.message || "Failed to get Events";
-    }
+  return await db.Event.findAll({
+    include: [
+      { 
+        model: db.Categorie, 
+        as: 'category', 
+        attributes: ['id','nombre','descripcion'] 
+      },
+      { 
+        model: db.User,
+        as: 'user',
+        attributes: ['id', 'username', 'email']
+      }
+    ]
+  });
 };
 
 const getEvent = async (id) => {
-    try {
-        let Event = await db.Event.findByPk(id, {
-            include: {
-                model: db.Categorie,
-                required: true,
-                as: "category",
-                attributes: ["id", "nombre", "descripcion"]
-            }
-        });
-        return Event;
-    } catch (error) {
-        throw { status: 500, message: error.message || "Failed to get Event" };
-    }
+  return await db.Event.findByPk(id, {
+    include: [
+      { 
+        model: db.Categorie, 
+        as: 'category', 
+        attributes: ['id','nombre','descripcion'] 
+      },
+      { 
+        model: db.User,
+        as: 'user',
+        attributes: ['id', 'username', 'email']
+      }
+    ]
+  });
 };
 
-const createEvent = async (name, description, startDate, endDate, categoryId, state, maxCapacity) => {
-    try {
-        let newEvent = await db.Event.create({
-            name,
-            description,
-            startDate,
-            endDate,
-            categoryId,
-            state,
-            maxCapacity
-        });
-        return newEvent;
-    } catch (error) {
-        return error.message || "Event could not be created";
-    }
+const createEvent = async (payload) => {
+  const { name, description, startDate, endDate, categoryId, state, maxCapacity, userId } = payload;
+  
+  // Validar que el usuario exista
+  const user = await db.User.findByPk(userId);
+  if (!user) {
+    throw { status: 400, message: "El usuario especificado no existe" };
+  }
+  
+  // Validar que la categoría exista
+  const category = await db.Categorie.findByPk(categoryId);
+  if (!category) {
+    throw { status: 400, message: "La categoría especificada no existe" };
+  }
+  
+  return await db.Event.create({ 
+    name, description, startDate, endDate, categoryId, state, maxCapacity, userId 
+  });
 };
 
-const updateEvent = async (id, name, description, startDate, endDate, categoryId, state, maxCapacity) => {
-    try {
-        let updatedEvent = await db.Event.update({
-            name,
-            description,
-            startDate,
-            endDate,
-            categoryId,
-            state,
-            maxCapacity
-        }, {
-            where: {
-                id
-            }
-        });
-        return updatedEvent;
-    } catch (error) {
-        return error.message || "Event could not be updated";
-    }
+const updateEvent = async (id, payload) => {
+  const [updatedRows] = await db.Event.update(payload, { where: { id } });
+  return updatedRows;
 };
 
 const deleteEvent = async (id) => {
-    try {
-        const deletedEvent = await db.Event.destroy({
-            where: {
-                id
-            }
-        });
-        return deletedEvent;
-    } catch (error) {
-        return error.message || "Event could not be deleted";
-    }
+  return await db.Event.destroy({ where: { id } });
 };
 
-module.exports = {
-    getAllEvents,
-    getEvent,
-    createEvent,
-    updateEvent,
-    deleteEvent
+module.exports = { 
+  getAllEvents, 
+  getEvent, 
+  createEvent, 
+  updateEvent, 
+  deleteEvent 
 };

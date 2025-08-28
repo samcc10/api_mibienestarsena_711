@@ -5,9 +5,16 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
+      // Un usuario pertenece a un rol
       User.belongsTo(models.Rol, {
         foreignKey: 'rolId',
-        as: 'Rol'
+        as: 'rol'  // Cambiado a minúscula para consistencia
+      });
+
+      // ⬇⬇⬇ NUEVA ASOCIACIÓN: Un usuario tiene muchos eventos
+      User.hasMany(models.Event, {
+        foreignKey: 'userId',
+        as: 'events'
       });
     }
   }
@@ -26,8 +33,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
-    tableName: 'Users', // ← AGREGAR ESTA LÍNEA
-    freezeTableName: true // ← OPCIONAL
+    tableName: 'Users',
+    freezeTableName: true
   });
   return User;
 };
